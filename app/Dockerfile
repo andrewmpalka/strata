@@ -5,11 +5,12 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /srv
 
-COPY requirements.txt ./
+COPY app/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY strata ./strata
-COPY tests ./tests
+COPY app/strata ./strata
+COPY app/tests ./tests
+COPY migrations ./migrations
 
 # No credentials are baked in. Every secret is read from the runtime
 # environment by strata.config.

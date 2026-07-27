@@ -21,10 +21,11 @@ semantics.
 
 ## Status
 
-**Day 1 of 37 — skeleton.** Postgres plus a minimal Python service that
-connects, logs `connected`, and idles. There is no schema, no ingestion, and no
-analytics yet. Migrations, the dataset contract, stream workers, and the
-dashboard arrive in later increments.
+**Day 2 of 37 — migration engine.** Postgres plus a Python service that
+connects, runs an explicit ledger-only bootstrap, applies ordered checksummed
+SQL migrations transactionally, logs `connected`, and idles. Migration 001
+populates a sentinel proving the mechanism. There is no ingestion or analytics
+yet.
 
 No empirical study findings are published because no qualifying live analytics
 run exists yet.
@@ -41,7 +42,8 @@ Or the documented manual, non-destructive foreground startup:
 docker compose --project-name strata_ci --env-file .env.demo up --build
 ```
 
-Expected: Postgres reports healthy, then the app logs `connected` and idles.
+Expected: Postgres reports healthy, migration 001 populates its sentinel, then
+the app logs `connected` and idles.
 
 Other targets: `make up`, `make verify`, `make test`, `make down`, `make clean`,
 `make logs`, `make psql`.
@@ -76,6 +78,7 @@ empty-but-serving dashboard, or a swallowed error.
 
 ```
 app/                  minimal Python service (Dockerfile, strata/, tests/)
+migrations/           ledger-only bootstrap + ordered numbered SQL migrations
 docs/                 canonical PRD
 scripts/ci.sh         pinned CI entrypoint + destructive-cleanup guard
 docker-compose.yml    postgres + app
