@@ -1,0 +1,60 @@
+# Strata — Day 1 skeleton.
+#
+# Project-name conventions are load-bearing, not cosmetic:
+#   CI / tests : docker compose --project-name strata_ci   --env-file .env.demo
+#   live       : docker compose --project-name strata_live --env-file .env.live
+#
+# The postgres volume below is declared WITHOUT an explicit `name:`, so Compose
+# prefixes it with the project name (strata_ci_pgdata vs strata_live_pgdata).
+# That prefix is the only thing standing between a CI teardown and weeks of
+# rate-limited live backfill. Do not give this volume a fixed name.
+
+services:
+  postgres:
+    image: postgres:16.4
+    environment:
+      # Sourced from the --env-file; no credential is written into this file
+      # or into any image layer.
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB is required}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER is required}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      # Keep initdb strict; scram avoids trust-auth surprises later.
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_HOST_PORT:-55432}:5432"
+    healthcheck:
+      # -U/-d are required: bare pg_isready reports ready during the initdb
+      # bootstrap phase, when the real database and role do not exist yet.
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\" -h 127.0.0.1",
+        ]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+
+  app:
+    build:
+      context: ./app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DEMO_MODE: ${DEMO_MODE:?DEMO_MODE is required}
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB is required}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER is required}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      DB_CONNECT_TIMEOUT_SECONDS: ${DB_CONNECT_TIMEOUT_SECONDS:-60}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    # Fail loudly and stay failed. A skeleton that silently restarts forever
+    # would look identical to a working stack in `up` output.
+    restart: "no"
+
+volumes:
+  pgdata:
