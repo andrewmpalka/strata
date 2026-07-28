@@ -47,6 +47,17 @@ The Makefile is the public verification interface:
 - `make test-e2e` aliases the full guarded green path.
 - `make test-docs` runs the public-guidance graph tests.
 
+The checkout-local targets require a local test environment:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e ".[test]"
+```
+
+This setup is required only for `make test-unit` and `make test-docs`;
+`make green` remains Docker-based.
+
 Operational convenience targets are `make up`, `make down`, `make clean`,
 `make logs`, `make psql`, and `make fg`; run `make help` for their descriptions.
 
@@ -77,7 +88,10 @@ empty-but-serving dashboard, or a swallowed error.
 
 ## Safety conventions
 
-- All tests and CI run under `--project-name strata_ci --env-file .env.demo`.
+- All container-backed tests and CI use Compose project names beginning with
+  `strata_ci` and the checked-in `.env.demo`. Checkout-local unit and
+  documentation checks do not start Compose and must never read live
+  configuration or access live resources.
 - `scripts/ci.sh` is the only sanctioned path for destructive cleanup. Its guard
   refuses to delete volumes unless the project name starts with `strata_ci`,
   `DEMO_MODE=true`, and the database is `strata_demo` or `strata_test`.
@@ -95,7 +109,7 @@ integration_tests/    PostgreSQL-backed integration tests
 migrations/           ledger-only bootstrap + ordered numbered SQL migrations
 docs/                 canonical PRD and focused guidance
 Makefile              public task and verification interface
-scripts/ci.sh         guarded Compose lifecycle and container-backed suites
+scripts/ci.sh:        guarded Compose lifecycle and container-backed suites
 Dockerfile            application image
 docker-compose.yml    PostgreSQL and application services
 .env.demo             demo configuration (no secrets)

@@ -38,6 +38,9 @@ GUIDANCE_DOCUMENTS = (
 )
 
 MARKDOWN_LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
+DIRECT_CI_COMMAND = re.compile(
+    r"(?m)^[ \t]*(?:\./)?scripts/ci\.sh[ \t]+\S+"
+)
 
 
 def _read(relative_path: Path) -> str:
@@ -96,6 +99,17 @@ def test_guidance_does_not_claim_to_supersede_the_prd():
         if forbidden_claim.search(text)
     ]
     assert not violations, f"guidance cannot supersede the canonical PRD: {violations}"
+
+
+def test_public_guidance_does_not_expose_direct_ci_commands():
+    paths = (Path("README.md"), Path("AGENTS.md"), *GUIDANCE_DOCUMENTS)
+    violations = [
+        str(path) for path in paths if DIRECT_CI_COMMAND.search(_read(path))
+    ]
+    assert not violations, (
+        "public verification commands must use Make targets; direct "
+        f"scripts/ci.sh commands found in: {violations}"
+    )
 
 
 @pytest.mark.parametrize(

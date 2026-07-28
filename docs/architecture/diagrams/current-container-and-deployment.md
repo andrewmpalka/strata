@@ -9,14 +9,15 @@ the current baseline is built and verified.
 
 ## How to read this diagram
 
-Read from the two command entry points on the left into the Compose boundary.
-Tests are verification artifacts outside the product-runtime boundary; arrows
-show when they are executed against or inside the disposable environment.
+Read from the public Makefile entry point into the protected CI implementation
+and then the Compose boundary. Tests are verification artifacts outside the
+product-runtime boundary; arrows show when they are executed against or inside
+the disposable environment.
 
 ```mermaid
 flowchart LR
     makefile["CURRENT COMMAND<br/>Makefile<br/>Public task and verification interface"]
-    ci["CURRENT COMMAND<br/>scripts/ci.sh<br/>Guards the Compose lifecycle and destructive cleanup"]
+    ci["CURRENT INTERNAL CONTROL<br/>scripts/ci.sh<br/>Guarded Compose lifecycle and destructive cleanup"]
     migrations[("CURRENT DATA STORE<br/>Top-level migration files<br/>Bootstrap plus ordered numbered SQL")]
     fast["CURRENT VERIFICATION ARTIFACT<br/>Fast test suite<br/>tests/unit, no database required"]
     integration["CURRENT VERIFICATION ARTIFACT<br/>PostgreSQL integration suite<br/>integration_tests"]
