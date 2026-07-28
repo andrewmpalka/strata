@@ -39,7 +39,8 @@ GUIDANCE_DOCUMENTS = (
 
 MARKDOWN_LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 DIRECT_CI_COMMAND = re.compile(
-    r"(?m)^[ \t]*(?:\./)?scripts/ci\.sh[ \t]+\S+"
+    r"(?m)^[ \t]*(?:\./)?scripts/ci\.sh[ \t]+"
+    r"(?:green|clean|up|down|test(?:-integration)?|logs|verify|psql)\b"
 )
 
 

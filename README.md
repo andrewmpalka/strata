@@ -109,7 +109,7 @@ integration_tests/    PostgreSQL-backed integration tests
 migrations/           ledger-only bootstrap + ordered numbered SQL migrations
 docs/                 canonical PRD and focused guidance
 Makefile              public task and verification interface
-scripts/ci.sh:        guarded Compose lifecycle and container-backed suites
+scripts/ci.sh         guarded Compose lifecycle and container-backed suites
 Dockerfile            application image
 docker-compose.yml    PostgreSQL and application services
 .env.demo             demo configuration (no secrets)
