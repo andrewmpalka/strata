@@ -11,11 +11,16 @@ Repository work is complete only when both parts of green are honest:
 
 ## Verification layers
 
-- `./scripts/harness unit` runs the fast, database-free suite.
-- `./scripts/harness integration` starts the disposable stack and runs the
-  PostgreSQL integration suite.
-- `./scripts/ci.sh green` is the sanctioned guarded clean build, populated-state
+- The Makefile is the public verification interface. It delegates protected
+  Compose lifecycle and destructive operations to `scripts/ci.sh`.
+- `make test-unit` runs the fast, database-free suite.
+- `make test-integration` starts the disposable stack and runs the PostgreSQL
+  integration suite.
+- `make test-e2e` aliases the full guarded green path.
+- `make test-docs` runs the public-guidance graph tests.
+- `make green` is the canonical isolated clean build, populated-state
   verification, and complete test run.
+- `make verify` verifies the running stack's populated state.
 - `make test` runs the complete suite in the current Compose application image.
 
 Fixture-first development decodes recorded artifacts before live source wiring.

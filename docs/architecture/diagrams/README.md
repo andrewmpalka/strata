@@ -65,7 +65,7 @@ boundaries use dashed lines.
 | Diagram | Code and configuration | Guidance | Canonical PRD |
 |---|---|---|---|
 | Current system context | `src/strata/`, `Dockerfile`, `docker-compose.yml`, `migrations/`, `scripts/` | [Repository layout](../repository-layout.md), [Migration contract](../migrations.md) | §7.3 |
-| Current deployment and verification topology | `Dockerfile`, `docker-compose.yml`, `scripts/harness`, `scripts/ci.sh`, `tests/`, `integration_tests/` | [Testing](../../engineering/testing.md), [CI isolation](../../engineering/ci-isolation.md) | §7.3 and §7.7 |
+| Current deployment and verification topology | `Dockerfile`, `docker-compose.yml`, `Makefile`, `scripts/ci.sh`, `tests/`, `integration_tests/` | [Testing](../../engineering/testing.md), [CI isolation](../../engineering/ci-isolation.md) | §7.3 and §7.7 |
 | Current startup and migrations | `src/strata/main.py`, `src/strata/config.py`, `src/strata/db.py`, `src/strata/migrations.py`, `migrations/` | [Migration contract](../migrations.md), [Migration operations](../../operations/migrations-and-recovery.md) | §7.3 |
 | Target platform responsibility map | No complete implementation yet | [Data pipeline](../data-pipeline.md), [Provider integration](../../engineering/provider-integration.md) | §3 and §7.1–§7.8 |
 | Target data lineage and publication | No complete implementation yet | [Data pipeline](../data-pipeline.md), [Coverage and publication](../coverage-and-publication.md) | §7, especially §7.5–§7.6 |

@@ -36,7 +36,22 @@ run exists yet.
 make green     # guarded clean teardown, build, verify populated state, run tests
 ```
 
-Or the documented manual, non-destructive foreground startup:
+The Makefile is the public verification interface:
+
+- `make green` runs the canonical isolated clean verification.
+- `make verify` verifies the running stack's populated state.
+- `make test` runs the complete test suite in the Compose application image.
+- `make test-unit` runs the fast checkout-local test suite.
+- `make test-integration` starts the disposable stack and runs the PostgreSQL
+  integration suite.
+- `make test-e2e` aliases the full guarded green path.
+- `make test-docs` runs the public-guidance graph tests.
+
+Operational convenience targets are `make up`, `make down`, `make clean`,
+`make logs`, `make psql`, and `make fg`; run `make help` for their descriptions.
+
+For manual foreground startup only, the following non-verification convenience
+is also supported:
 
 ```bash
 docker compose --project-name strata_ci --env-file .env.demo up --build
@@ -44,9 +59,6 @@ docker compose --project-name strata_ci --env-file .env.demo up --build
 
 Expected: Postgres reports healthy, migration 001 populates its sentinel, then
 the app logs `connected` and idles.
-
-Other targets: `make up`, `make verify`, `make test`, `make down`, `make clean`,
-`make logs`, `make psql`.
 
 ## Modes
 
@@ -77,10 +89,14 @@ empty-but-serving dashboard, or a swallowed error.
 ## Layout
 
 ```
-app/                  minimal Python service (Dockerfile, strata/, tests/)
+src/strata/           Python package implementation
+tests/                fast checkout-local tests
+integration_tests/    PostgreSQL-backed integration tests
 migrations/           ledger-only bootstrap + ordered numbered SQL migrations
-docs/                 canonical PRD
-scripts/ci.sh         pinned CI entrypoint + destructive-cleanup guard
-docker-compose.yml    postgres + app
+docs/                 canonical PRD and focused guidance
+Makefile              public task and verification interface
+scripts/ci.sh         guarded Compose lifecycle and container-backed suites
+Dockerfile            application image
+docker-compose.yml    PostgreSQL and application services
 .env.demo             demo configuration (no secrets)
 ```

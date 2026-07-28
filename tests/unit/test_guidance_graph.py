@@ -12,7 +12,7 @@ ROOT_GUIDANCE = REPOSITORY_ROOT / "AGENTS.md"
 
 # The runtime verification image copies the test suites but intentionally does
 # not copy repository documentation or Git metadata. Guidance validation is a
-# source-checkout responsibility exposed by `scripts/harness docs`. A checkout
+# source-checkout responsibility exposed by `make test-docs`. A checkout
 # with a deleted AGENTS.md still reaches the failing existence assertion below.
 if not ROOT_GUIDANCE.exists() and not (REPOSITORY_ROOT / ".git").exists():
     pytest.skip(
