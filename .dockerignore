@@ -15,4 +15,3 @@ dist/
 .DS_Store
 AGENTS.md
 CLAUDE.md
-docs/permagreen_cleanup_then_agents_refactor.md
