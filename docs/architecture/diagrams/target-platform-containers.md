@@ -1,6 +1,6 @@
-# C4 Container — TARGET MVP platform, not fully implemented
+# Logical Responsibility Map — TARGET MVP platform, not fully implemented
 
-This view presents the approved MVP container responsibilities for a
+This logical component view presents the approved MVP responsibilities for a
 reproducible Ethereum and Aptos data platform and its observational
 authentication-mode retention study.
 
@@ -24,19 +24,19 @@ flowchart TB
     canonical["EXTERNAL SYSTEM<br/>Canonical history and registry sources<br/>Authoritative activation, EntryPoint, and account evidence"]
     fixtures[("TARGET DATA STORE<br/>Checked-in deterministic fixtures<br/>Demo evidence with zero network access")]
 
-    subgraph target_platform["TARGET MVP — Strata platform containers, not fully implemented"]
-        contract["TARGET CONTAINER<br/>Dataset contract<br/>Governs networks, windows, scopes, lists, and version pins"]
-        eth_adapter["TARGET CONTAINER<br/>Ethereum provider adapters<br/>Acquire finalized, source-specific evidence"]
-        apt_adapter["TARGET CONTAINER<br/>Aptos provider adapters<br/>Acquire committed, source-specific evidence"]
-        raw["TARGET CONTAINER<br/>Raw evidence ingestion<br/>Retain provider-shaped payloads, provenance, and hashes"]
-        staging["TARGET CONTAINER<br/>Typed staging and parsers<br/>Decode evidence under parser versions"]
-        facts["TARGET CONTAINER<br/>Activity-fact builder<br/>Preserve actor, role, success, meaning, exclusions, and pins"]
-        control["TARGET CONTAINER<br/>Coverage and watermark control<br/>Record intervals and advance only after durable writes"]
-        features["TARGET CONTAINER<br/>Feature and cohort builder<br/>Apply index, temporal, attribution, and maturity rules"]
-        analytics["TARGET CONTAINER<br/>Matching and retention analytics<br/>Estimate descriptive associations for eligible populations"]
-        gate["TARGET CONTAINER<br/>Run manifest and publication gate<br/>Bind lineage and refuse incomplete publication"]
+    subgraph target_platform["TARGET MVP — Strata platform responsibilities, not fully implemented"]
+        contract["TARGET RESPONSIBILITY<br/>Dataset contract<br/>Governs networks, windows, scopes, lists, and version pins"]
+        eth_adapter["TARGET RESPONSIBILITY<br/>Ethereum provider adapters<br/>Acquire finalized, source-specific evidence"]
+        apt_adapter["TARGET RESPONSIBILITY<br/>Aptos provider adapters<br/>Acquire committed, source-specific evidence"]
+        raw["TARGET RESPONSIBILITY<br/>Raw evidence ingestion<br/>Retain provider-shaped payloads, provenance, and hashes"]
+        staging["TARGET RESPONSIBILITY<br/>Typed staging and parsers<br/>Decode evidence under parser versions"]
+        facts["TARGET RESPONSIBILITY<br/>Activity-fact builder<br/>Preserve actor, role, success, meaning, exclusions, and pins"]
+        control["TARGET RESPONSIBILITY<br/>Coverage and watermark control<br/>Record intervals and advance only after durable writes"]
+        features["TARGET RESPONSIBILITY<br/>Feature and cohort builder<br/>Apply index, temporal, attribution, and maturity rules"]
+        analytics["TARGET RESPONSIBILITY<br/>Matching and retention analytics<br/>Estimate descriptive associations for eligible populations"]
+        gate["TARGET RESPONSIBILITY<br/>Run manifest and publication gate<br/>Bind lineage and refuse incomplete publication"]
         postgres[("TARGET DATA STORE<br/>PostgreSQL<br/>Persist evidence, derived layers, coverage, runs, and results")]
-        dashboard["TARGET CONTAINER<br/>Streamlit dashboard<br/>Serve run-labeled results, coverage, and freshness"]
+        dashboard["TARGET RESPONSIBILITY<br/>Streamlit dashboard<br/>Serve run-labeled results, coverage, and freshness"]
     end
 
     ethereum -->|"live finalized Ethereum evidence"| eth_adapter
@@ -82,8 +82,9 @@ flowchart TB
 - `EXTERNAL SYSTEM` is outside Strata and may have a different evidence
   universe.
 - `DATA STORE` is persistent fixture or PostgreSQL state.
-- C4 Container semantics describe deployable responsibilities; they do not
-  require each box to become an independently deployed microservice.
+- This is a logical responsibility/component view, not a C4 Container diagram.
+  A responsibility may later share a runnable worker with other
+  responsibilities.
 - MVP means minimum viable product. API means application programming
   interface.
 
@@ -92,7 +93,8 @@ flowchart TB
 The complete diagram is a target view. The repository currently implements only
 the configuration, PostgreSQL connection, migration runner, migration ledger,
 sentinel, and verification baseline. The provider, lineage, analytics,
-publication, and dashboard containers shown here are not fully implemented.
+publication, and dashboard responsibilities shown here are not fully
+implemented.
 
 ## Limitations and non-goals
 

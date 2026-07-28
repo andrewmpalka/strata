@@ -25,16 +25,19 @@ erDiagram
     raw_artifact ||--o{ first_activity : proves
     raw_artifact ||--o{ authorization_attempt : preserves
     staging_record ||--o{ activity_fact : derives
-    authorization_attempt ||--o| delegation_observation : may_prove
+    authorization_attempt ||--o{ delegation_observation : may_prove
     activity_fact ||--o{ address_feature : aggregates_into
     first_activity ||--o{ address_feature : informs
     delegation_observation ||--o{ address_feature : informs_state
     address_feature ||--o{ control_candidate_index : screens
-    address_feature ||--o{ matched_pair : supplies_treated
-    control_candidate_index ||--o{ matched_pair : supplies_control
+    address_feature ||--o| matched_pair : supplies_treated
+    control_candidate_index ||--o| matched_pair : supplies_control
+    analytics_run ||--o{ address_feature : derives
+    analytics_run ||--o{ control_candidate_index : evaluates
     analytics_run ||--o{ matched_pair : binds
-    stream_coverage }o--o{ analytics_run : constrains
-    watermark }o--o{ stream_coverage : bounds
+    analytics_run ||--o{ run_coverage_binding : records
+    stream_coverage ||--o{ run_coverage_binding : supplies
+    watermark ||--o{ stream_coverage : bounds
     analytics_run ||--o{ published_result : publishes
 
     dataset_contract {
@@ -121,6 +124,13 @@ erDiagram
         string manifest_version
         string status
     }
+    run_coverage_binding {
+        string binding_id PK
+        string run_id FK
+        string coverage_id FK
+        string required_stream
+        string covered_interval
+    }
     published_result {
         string result_id PK
         string run_id FK
@@ -135,8 +145,8 @@ erDiagram
 |---|---|
 | Identity keys | Raw, staging, facts, coverage, observations, features, pairs, runs, and results use stable natural or surrogate identities with the chain/scope/version context needed to prevent accidental collision. Ethereum and Aptos addresses retain chain-specific byte representations. |
 | Append-only or versioned evidence | `raw_artifact`, `authorization_attempt`, `delegation_observation`, `stream_coverage`, and analytical manifests are append-only or explicitly versioned. Parser corrections create new `staging_record` versions rather than overwrite evidence. |
-| Run-bound entities | `address_feature`, `control_candidate_index`, `matched_pair`, and `published_result` bind to one `analytics_run` and its validated contract and manifest. |
-| Coverage-bound publication | `analytics_run` records the gap-free completed intersection. `published_result` exists only for an eligible published run; insufficient coverage yields an auditable refused run without partial results. |
+| Run-bound entities | `address_feature`, `control_candidate_index`, `matched_pair`, `run_coverage_binding`, and `published_result` bind to one `analytics_run` and its validated contract and manifest. |
+| Coverage-bound publication | `run_coverage_binding` identifies the completed intervals used by a run, and `analytics_run` records their gap-free intersection. `published_result` exists only for an eligible published run; insufficient coverage yields an auditable refused run without partial results. |
 | Attempt versus delegation | `authorization_attempt` records observed authorization evidence and validity separately. `delegation_observation` requires proof that delegation was applied; an attempt does not imply an applied delegation. |
 | Actor versus payer or passive party | `activity_fact.actor_key` follows structural attribution. Bundlers, fee payers, sponsors, and passive recipients are never actors; payer and participant roles remain separate attributes. |
 
@@ -146,8 +156,7 @@ erDiagram
 - ER means entity-relationship. PK means primary key. FK means foreign key.
 - Crow's-foot cardinality describes logical multiplicity, not a complete
   physical migration design.
-- The direct-delegation population remains descriptive; the matched analysis
-  uses only exposure states supported by the canonical evidence rules.
+- `eoa_7702_direct` is descriptive-only and never a matched arm.
 
 ## Current versus target
 

@@ -46,12 +46,12 @@ sequenceDiagram
         alt Retry budget expires
             App-->>Operator: Report connection timeout and exit 4
         else Connection succeeds within budget
-            App->>Resolver: Resolve explicit or installed-source migration path
-            Resolver-->>App: Return /srv/migrations or supported source path
-            App->>Runner: Run migrations with dedicated connection
-            Runner->>DB: Acquire session advisory lock
+            App->>Resolver: Resolve explicit container override or source-checkout-relative migration path
+            Resolver-->>App: Return /srv/migrations or repository migration directory
+            App->>Runner: Run migrations on the startup database connection
             Runner->>Files: Discover bootstrap and numbered SQL in version order
             Files-->>Runner: Return UTF-8 SQL and SHA-256 checksums
+            Runner->>DB: Acquire session advisory lock
 
             alt Migration ledger is absent
                 Runner->>DB: Bootstrap schema_migrations only
@@ -123,7 +123,7 @@ migration-discovery limitation.
 | Compose starts PostgreSQL before the application | Current | `docker-compose.yml` |
 | Configuration errors exit visibly | Current | `src/strata/config.py`, `src/strata/main.py`, `tests/unit/test_config_and_retry.py` |
 | Transient connections retry within a budget; fatal rejection and timeout differ | Current | `src/strata/db.py`, `integration_tests/postgres/test_connection.py` |
-| Migration path uses an explicit container override or installed-source resolution | Current | `Dockerfile`, `src/strata/main.py`, [migration contract](../migrations.md) |
+| Migration path uses an explicit container override or source-checkout-relative resolution | Current | `Dockerfile`, `src/strata/main.py`, [migration contract](../migrations.md) |
 | Bootstrap creates only the ledger when absent | Current | `migrations/bootstrap.sql`, `src/strata/migrations.py`, `integration_tests/migrations/test_migrations.py` |
 | Applied migrations are checksum-verified and pending migrations are transactional | Current | `src/strata/migrations.py`, [migration contract](../migrations.md) |
 | Migration 001 creates and populates the sentinel | Current | `migrations/001_migration_sentinel.sql`, `scripts/ci.sh` |

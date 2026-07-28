@@ -1,4 +1,4 @@
-# C4 Container and Deployment — current verification environment
+# Deployment and Verification Topology — current verification environment
 
 This view maps the implemented repository entry points, runtime containers,
 installed package, migration files, and test suites. It also shows the guarded
@@ -20,7 +20,7 @@ flowchart LR
     migrations[("CURRENT DATA STORE<br/>Top-level migration files<br/>Bootstrap plus ordered numbered SQL")]
     fast["CURRENT VERIFICATION ARTIFACT<br/>Fast test suite<br/>tests/unit, no database required"]
     integration["CURRENT VERIFICATION ARTIFACT<br/>PostgreSQL integration suite<br/>integration_tests"]
-    network["CURRENT CONTROL<br/>Demo verification network boundary<br/>No external provider calls"]
+    provider_free["CURRENT CONTROL<br/>Current provider-free baseline<br/>No provider client exists in the implemented source tree"]
 
     subgraph ci_boundary["CURRENT DEPLOYMENT — Compose project strata_ci only"]
         compose["CURRENT EXECUTION ENVIRONMENT<br/>Docker Compose<br/>Builds, starts, waits, and runs checks"]
@@ -38,7 +38,7 @@ flowchart LR
     harness -->|"runs fast suite directly"| fast
     harness -->|"delegates database-backed lifecycle"| ci
     ci -->|"invokes pinned strata_ci Compose commands"| compose
-    ci -->|"enforces deterministic provider-free verification"| network
+    app -->|"contains no provider client calls"| provider_free
     migrations -->|"copied to /srv/migrations"| app
     package -->|"resolves STRATA_MIGRATIONS_DIR=/srv/migrations"| migrations
     fast -->|"verifies package behavior without a database"| package
@@ -52,7 +52,7 @@ flowchart LR
     classDef store fill:#f5f5f5,stroke:#333,stroke-width:2px,color:#111;
     classDef verify fill:#f8f4ff,stroke:#604080,stroke-width:2px,color:#111;
     classDef prohibited fill:#fff0f0,stroke:#8b1a1a,stroke-width:3px,color:#111;
-    class harness,ci,compose,app,package,postgres,network current;
+    class harness,ci,compose,app,package,postgres,provider_free current;
     class migrations,volume store;
     class fast,integration verify;
     class excluded prohibited;
@@ -60,12 +60,15 @@ flowchart LR
 
 ## Legend and notation
 
-- `CURRENT CONTAINER` is a deployable runtime instance in C4 terms.
+- `CURRENT CONTAINER` is a runnable container instance in the Compose
+  deployment.
 - `CURRENT CONTAINER CONTENT` is installed inside a container, not a separate
   deployable service.
 - `VERIFICATION ARTIFACT` is test code, never a product runtime container.
 - `CURRENT CONTROL` states a verified execution constraint rather than a
   deployable product container.
+- `Current provider-free baseline` describes the implemented source tree; it
+  does not claim a firewall or network-namespace control.
 - `DATA STORE` identifies repository SQL or persistent database state.
 - The dotted refusal arrow is a prohibited interaction, reinforced by text.
 

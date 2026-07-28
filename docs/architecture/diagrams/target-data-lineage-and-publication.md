@@ -26,7 +26,7 @@ flowchart TB
     facts[("TARGET DATA STORE<br/>Actor-safe activity facts<br/>Actor, role, class, success, meaning, exclusions, pins")]
     features[("TARGET DATA STORE<br/>Features and cohorts<br/>Index-safe covariates, exposure, maturity, and eligibility")]
     runs[("TARGET DATA STORE<br/>Analytics runs<br/>Matching, retention, balance, intervals, and status")]
-    published[("TARGET DATA STORE<br/>Published dashboard and findings state<br/>Atomic, labeled outputs only")]
+    published[("TARGET DATA STORE<br/>Published result state<br/>Atomic, labeled outputs only")]
 
     contract["TARGET CONTROL<br/>Validated dataset contract<br/>Windows, scopes, populations, lists, and version pins"]
     coverage["TARGET CONTROL<br/>Stream coverage<br/>completed, completed-empty, failed, and explicit gaps"]
@@ -37,7 +37,7 @@ flowchart TB
     evidence -->|"provider responses and source provenance"| raw
     raw -->|"payloads plus content hashes"| staging
     staging -->|"typed parser-versioned observations"| facts
-    facts -->|"successful actor-role activity and declared exclusions"| features
+    facts -->|"actor-attributed facts with success, meaningfulness, participant role, and exclusion state"| features
     features -->|"eligible cohorts, controls, covariates, and outcomes"| runs
     runs -->|"candidate run outputs and status"| gate
     gate -->|"atomic run-labeled results when eligible"| published
@@ -86,9 +86,9 @@ sequenceDiagram
     Note over Runner,Coverage: completed-empty is valid coverage, while failed intervals and gaps block publication
 
     alt Sufficient gap-free intersection for every required stream
-        Runner->>Data: Read validated facts, features, cohorts, and eligible matched data
-        Data-->>Runner: Return run-bound analytical inputs
-        Runner->>Runner: Derive features, matching diagnostics, retention, and suppression state
+        Runner->>Data: Read validated facts and candidate-index inputs
+        Data-->>Runner: Return run-bound source inputs
+        Runner->>Runner: Derive features, cohorts, matched pairs, retention, and suppression state
         Runner->>Runs: Write complete run and manifest with covered intersection
         Runs-->>Runner: Confirm durable run and lineage record
         Runner->>Gate: Request atomic publication for the complete run
