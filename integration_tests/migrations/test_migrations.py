@@ -20,7 +20,7 @@ from strata.migrations import (
     run_migrations,
 )
 
-REPOSITORY_MIGRATIONS = Path.cwd() / "migrations"
+REPOSITORY_MIGRATIONS = Path(__file__).resolve().parents[2] / "migrations"
 
 
 @pytest.fixture

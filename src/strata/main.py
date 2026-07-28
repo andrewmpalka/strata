@@ -23,6 +23,13 @@ def _handle_signal(signum, _frame) -> None:
     _shutdown.set()
 
 
+def _migrations_dir() -> Path:
+    override = os.environ.get("STRATA_MIGRATIONS_DIR")
+    if override:
+        return Path(override)
+    return Path(__file__).resolve().parents[2] / "migrations"
+
+
 def main() -> int:
     logging.basicConfig(
         level=logging.INFO,
@@ -54,9 +61,8 @@ def main() -> int:
         return 4
 
     with conn:
-        migrations_dir = Path(os.environ.get("STRATA_MIGRATIONS_DIR", "migrations"))
         try:
-            applied = run_migrations(conn, migrations_dir)
+            applied = run_migrations(conn, _migrations_dir())
         except MigrationError as exc:
             logger.error("migration failure: %s", exc)
             return 5
