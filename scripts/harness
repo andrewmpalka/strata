@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO_ROOT"
+
+usage() {
+  printf 'usage: %s {unit|integration|e2e|all}\n' "${0##*/}" >&2
+}
+
+case "${1:-}" in
+  unit)
+    exec python -m pytest tests
+    ;;
+  integration)
+    "$REPO_ROOT/scripts/ci.sh" up
+    exec "$REPO_ROOT/scripts/ci.sh" test-integration
+    ;;
+  e2e|all)
+    exec "$REPO_ROOT/scripts/ci.sh" green
+    ;;
+  *)
+    usage
+    exit 2
+    ;;
+esac

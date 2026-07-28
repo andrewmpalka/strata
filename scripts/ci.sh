@@ -11,7 +11,7 @@
 # backfill that no rerun can reproduce. The guard below is the safety interlock;
 # bypassing, weakening, or temporarily disabling it is prohibited.
 #
-# Usage: scripts/ci.sh {green|clean|up|down|test|logs|verify|psql}
+# Usage: scripts/ci.sh {green|clean|up|down|test|test-integration|logs|verify|psql}
 
 set -Eeuo pipefail
 
@@ -167,13 +167,22 @@ cmd_verify() {
   log "verify passed"
 }
 
-cmd_test() {
-  log "running the test suite inside the app image"
+run_pytest() {
   # STRATA_REQUIRE_DB=1 turns a skipped integration test into a failure, so a
   # green suite cannot mean "the database tests never ran".
   compose run --rm --no-deps \
     -e STRATA_REQUIRE_DB=1 \
-    app python -m pytest tests -v
+    app python -m pytest "$@" -v
+}
+
+cmd_test() {
+  log "running the complete test suite inside the app image"
+  run_pytest tests integration_tests
+}
+
+cmd_test_integration() {
+  log "running the integration test suite inside the app image"
+  run_pytest integration_tests
 }
 
 cmd_logs() { compose logs "$@"; }
@@ -203,7 +212,8 @@ case "${1:-green}" in
   down)   cmd_down ;;
   verify) cmd_verify ;;
   test)   cmd_test ;;
+  test-integration) cmd_test_integration ;;
   logs)   shift; cmd_logs "$@" ;;
   psql)   shift; cmd_psql "$@" ;;
-  *)      die "unknown command '$1' (expected: green|clean|up|down|verify|test|logs|psql)" ;;
+  *)      die "unknown command '$1' (expected: green|clean|up|down|verify|test|test-integration|logs|psql)" ;;
 esac
