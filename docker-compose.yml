@@ -39,7 +39,8 @@ services:
 
   app:
     build:
-      context: ./app
+      context: .
+      dockerfile: app/Dockerfile
     depends_on:
       postgres:
         condition: service_healthy

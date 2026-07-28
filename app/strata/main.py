@@ -1,18 +1,17 @@
-"""Day 1 skeleton entrypoint: connect to Postgres, log "connected", idle.
-
-There is deliberately no schema work here. Migrations arrive as ordered
-plain-SQL files in a later increment.
-"""
+"""Strata entrypoint: connect, migrate, report healthy, and idle."""
 
 from __future__ import annotations
 
 import logging
+import os
 import signal
 import sys
 import threading
+from pathlib import Path
 
 from .config import ConfigError, load_config
 from .db import ConnectionTimeout, FatalConnectionError, connect_with_backoff
+from .migrations import MigrationError, run_migrations
 
 logger = logging.getLogger("strata")
 
@@ -55,6 +54,13 @@ def main() -> int:
         return 4
 
     with conn:
+        migrations_dir = Path(os.environ.get("STRATA_MIGRATIONS_DIR", "migrations"))
+        try:
+            applied = run_migrations(conn, migrations_dir)
+        except MigrationError as exc:
+            logger.error("migration failure: %s", exc)
+            return 5
+
         with conn.cursor() as cur:
             cur.execute("SELECT current_database(), current_user, version()")
             dbname, user, version = cur.fetchone()
@@ -63,6 +69,10 @@ def main() -> int:
         conn.commit()
 
         logger.info("connected")
+        logger.info(
+            "migration check complete: applied=%s",
+            ",".join(f"{item:03d}" for item in applied) or "none",
+        )
         logger.info(
             "postgres handshake ok: database=%s user=%s server=%s",
             dbname,
@@ -73,7 +83,7 @@ def main() -> int:
         signal.signal(signal.SIGTERM, _handle_signal)
         signal.signal(signal.SIGINT, _handle_signal)
 
-        logger.info("idling; no ingestion or analytics exists in this increment")
+        logger.info("idling; migration sentinel is populated")
         _shutdown.wait()
 
     logger.info("shutdown complete")

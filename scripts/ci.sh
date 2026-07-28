@@ -99,7 +99,7 @@ cmd_up() {
 }
 
 # Assert the stack reached the expected POPULATED-for-this-increment state.
-# At Day 1 that means: postgres healthy, app logged "connected", app still up.
+# At Day 2 that includes a checksummed 001 ledger row and sentinel data.
 cmd_verify() {
   local pg_container app_container
   pg_container="$(compose ps -q postgres)"
@@ -135,6 +135,29 @@ cmd_verify() {
     sleep 1
   done
   log "app logged 'connected'"
+
+  local migration_state
+  migration_state="$(
+    compose exec -T postgres sh -c \
+      'PGPASSWORD="$POSTGRES_PASSWORD" exec psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "$1"' \
+      sh \
+      "SELECT count(*) || ':' || min(version) || ':' || min(length(checksum))
+       FROM schema_migrations"
+  )"
+  [[ "$migration_state" == "1:1:64" ]] || die \
+    "migration ledger state is '$migration_state', expected '1:1:64'"
+  log "migration ledger contains checksummed version 001"
+
+  local sentinel
+  sentinel="$(
+    compose exec -T postgres sh -c \
+      'PGPASSWORD="$POSTGRES_PASSWORD" exec psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "$1"' \
+      sh \
+      "SELECT message FROM strata_migration_sentinel WHERE singleton"
+  )"
+  [[ "$sentinel" == "migration engine ready" ]] || die \
+    "migration sentinel is '$sentinel', expected 'migration engine ready'"
+  log "migration sentinel is populated"
 
   # An app that logged 'connected' and then crashed is not green.
   local restarts
