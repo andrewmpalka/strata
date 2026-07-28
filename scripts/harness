@@ -6,10 +6,13 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 usage() {
-  printf 'usage: %s {unit|integration|e2e|all}\n' "${0##*/}" >&2
+  printf 'usage: %s {docs|unit|integration|e2e|all}\n' "${0##*/}" >&2
 }
 
 case "${1:-}" in
+  docs)
+    exec python -m pytest tests/unit/test_guidance_graph.py
+    ;;
   unit)
     exec python -m pytest tests
     ;;
