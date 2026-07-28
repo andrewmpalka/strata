@@ -13,6 +13,7 @@ RUN pip install --no-cache-dir ".[test]" \
     && rm -rf src
 
 COPY migrations ./migrations
+COPY fixtures ./fixtures
 COPY tests ./tests
 COPY integration_tests ./integration_tests
 
