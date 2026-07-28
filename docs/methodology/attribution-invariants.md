@@ -16,8 +16,7 @@ chain semantics and dataset contract.
   it from the authorization tuple signature. A malformed signature fails loudly
   and must never resolve to a plausible but wrong address.
 - Exposure state is assigned using code at the index block, never `latest`.
-- `eoa_7702_direct` is descriptive-only and never a matched arm without the
-  stronger attribution evidence required by the PRD.
+- `eoa_7702_direct` is descriptive-only and never a matched arm.
 
 ## Both chains
 

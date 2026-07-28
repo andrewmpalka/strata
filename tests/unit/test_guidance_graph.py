@@ -203,6 +203,11 @@ CRITICAL_RULES = (
         r"Exposure state is assigned using code at the index block, never `latest`",
     ),
     (
+        "direct 7702 matched-arm prohibition",
+        Path("docs/methodology/attribution-invariants.md"),
+        r"`eoa_7702_direct` is descriptive-only and never a matched arm\.",
+    ),
+    (
         "fixture findings prohibition",
         Path("docs/methodology/study-integrity.md"),
         r"Fixture data never produces empirical findings",
