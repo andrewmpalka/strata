@@ -12,7 +12,7 @@ ROOT_GUIDANCE = REPOSITORY_ROOT / "AGENTS.md"
 
 # The runtime verification image copies the test suites but intentionally does
 # not copy repository documentation or Git metadata. Guidance validation is a
-# source-checkout responsibility exposed by `scripts/harness docs`. A checkout
+# source-checkout responsibility exposed by `make test-docs`. A checkout
 # with a deleted AGENTS.md still reaches the failing existence assertion below.
 if not ROOT_GUIDANCE.exists() and not (REPOSITORY_ROOT / ".git").exists():
     pytest.skip(
@@ -38,6 +38,10 @@ GUIDANCE_DOCUMENTS = (
 )
 
 MARKDOWN_LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
+DIRECT_CI_COMMAND = re.compile(
+    r"(?m)^[ \t]*(?:\./)?scripts/ci\.sh[ \t]+"
+    r"(?:green|clean|up|down|test(?:-integration)?|logs|verify|psql)\b"
+)
 
 
 def _read(relative_path: Path) -> str:
@@ -96,6 +100,17 @@ def test_guidance_does_not_claim_to_supersede_the_prd():
         if forbidden_claim.search(text)
     ]
     assert not violations, f"guidance cannot supersede the canonical PRD: {violations}"
+
+
+def test_public_guidance_does_not_expose_direct_ci_commands():
+    paths = (Path("README.md"), Path("AGENTS.md"), *GUIDANCE_DOCUMENTS)
+    violations = [
+        str(path) for path in paths if DIRECT_CI_COMMAND.search(_read(path))
+    ]
+    assert not violations, (
+        "public verification commands must use Make targets; direct "
+        f"scripts/ci.sh commands found in: {violations}"
+    )
 
 
 @pytest.mark.parametrize(

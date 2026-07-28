@@ -20,9 +20,10 @@ Treat these conditions as hard stops:
 - A fatal database rejection is configuration failure and must not become an
   unbounded readiness wait.
 
-Disposable demo or test state may be reset only through `./scripts/ci.sh clean`
-or the clean phase of `./scripts/ci.sh green`, after the isolation guard passes.
-Routine destructive recovery is prohibited for live data.
+Disposable demo or test state may be reset only through `make clean` or the
+clean phase of `make green`. The Makefile delegates destructive cleanup to
+`scripts/ci.sh`, whose isolation guard must pass. Routine destructive recovery
+is prohibited for live data.
 
 When retained provider evidence needs reinterpretation, replay staging from raw
 artifacts under a new parser version. Do not destroy history or re-fetch merely

@@ -57,5 +57,5 @@ ingestion or empirical analysis exists.
 | The application loads configuration, connects, migrates, reports connected, and idles | Current | `src/strata/main.py`, `src/strata/config.py`, `src/strata/db.py` |
 | Compose starts PostgreSQL and the application | Current | `docker-compose.yml`, `Dockerfile` |
 | Migrations are repository-owned, ordered, checksummed, and transactional | Current | `src/strata/migrations.py`, `migrations/`, [migration contract](../migrations.md) |
-| Verification is repository-owned and guarded | Current | `scripts/harness`, `scripts/ci.sh`, [testing guidance](../../engineering/testing.md) |
+| Verification is repository-owned and guarded | Current | `Makefile`, `scripts/ci.sh`, [testing guidance](../../engineering/testing.md) |
 | Ingestion, analytics, and dashboard are absent from current implementation | Current boundary | `src/strata/`, `migrations/`, [canonical PRD §7](../../Strata_PRD_v3.2_MASTER.md#7-architecture) |

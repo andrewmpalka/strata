@@ -16,8 +16,9 @@ canonical PRD governs product and study semantics.
 - The root `Dockerfile` installs the package from `src/`, then copies migrations
   and verification suites into the image. `docker-compose.yml` defines the
   current PostgreSQL and application services.
-- `scripts/harness` is a thin test dispatcher. `scripts/ci.sh` owns the guarded
-  Compose lifecycle and full clean verification.
+- The root `Makefile` is the public task and verification interface.
+  `scripts/ci.sh` owns the guarded Compose lifecycle, destructive cleanup,
+  populated-state verification, and container-backed full runs.
 
 Do not create a second package implementation under a script, test, application,
 or compatibility directory. Runtime validation belongs in `src/strata/`;

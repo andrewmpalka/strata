@@ -9,14 +9,15 @@ the current baseline is built and verified.
 
 ## How to read this diagram
 
-Read from the two command entry points on the left into the Compose boundary.
-Tests are verification artifacts outside the product-runtime boundary; arrows
-show when they are executed against or inside the disposable environment.
+Read from the public Makefile entry point into the protected CI implementation
+and then the Compose boundary. Tests are verification artifacts outside the
+product-runtime boundary; arrows show when they are executed against or inside
+the disposable environment.
 
 ```mermaid
 flowchart LR
-    harness["CURRENT COMMAND<br/>scripts/harness<br/>Dispatches documentation, fast, and database-backed checks"]
-    ci["CURRENT COMMAND<br/>scripts/ci.sh<br/>Guards the Compose lifecycle and destructive cleanup"]
+    makefile["CURRENT COMMAND<br/>Makefile<br/>Public task and verification interface"]
+    ci["CURRENT INTERNAL CONTROL<br/>scripts/ci.sh<br/>Guarded Compose lifecycle and destructive cleanup"]
     migrations[("CURRENT DATA STORE<br/>Top-level migration files<br/>Bootstrap plus ordered numbered SQL")]
     fast["CURRENT VERIFICATION ARTIFACT<br/>Fast test suite<br/>tests/unit, no database required"]
     integration["CURRENT VERIFICATION ARTIFACT<br/>PostgreSQL integration suite<br/>integration_tests"]
@@ -35,8 +36,8 @@ flowchart LR
         postgres -->|"persists database files"| volume
     end
 
-    harness -->|"runs fast suite directly"| fast
-    harness -->|"delegates database-backed lifecycle"| ci
+    makefile -->|"runs fast suite directly"| fast
+    makefile -->|"delegates protected Compose lifecycle"| ci
     ci -->|"invokes pinned strata_ci Compose commands"| compose
     app -->|"contains no provider client calls"| provider_free
     migrations -->|"copied to /srv/migrations"| app
@@ -52,7 +53,7 @@ flowchart LR
     classDef store fill:#f5f5f5,stroke:#333,stroke-width:2px,color:#111;
     classDef verify fill:#f8f4ff,stroke:#604080,stroke-width:2px,color:#111;
     classDef prohibited fill:#fff0f0,stroke:#8b1a1a,stroke-width:3px,color:#111;
-    class harness,ci,compose,app,package,postgres,provider_free current;
+    class makefile,ci,compose,app,package,postgres,provider_free current;
     class migrations,volume store;
     class fast,integration verify;
     class excluded prohibited;
@@ -89,7 +90,7 @@ live operator procedure.
 
 | Diagram claim | Status | Source |
 |---|---|---|
-| `scripts/harness` is a thin test dispatcher | Current | `scripts/harness`, [repository layout](../repository-layout.md) |
+| The root `Makefile` is the public task and verification interface | Current | `Makefile`, [repository layout](../repository-layout.md) |
 | `scripts/ci.sh` owns guarded Compose lifecycle and cleanup | Current | `scripts/ci.sh`, [CI isolation](../../engineering/ci-isolation.md) |
 | The image runs Python 3.12 and `python -m strata.main` | Current | `Dockerfile` |
 | The container sets `STRATA_MIGRATIONS_DIR=/srv/migrations` | Current | `Dockerfile`, `src/strata/main.py` |

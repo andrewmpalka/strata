@@ -2,8 +2,11 @@
 
 This file is the canonical destructive-cleanup safety contract.
 
-- Tests and CI use Compose project names beginning with `strata_ci`, the checked-in
-  `.env.demo`, and only the disposable databases `strata_demo` or `strata_test`.
+- All container-backed tests and CI use
+  Compose project names beginning with `strata_ci`, the checked-in `.env.demo`,
+  and only the disposable databases `strata_demo` or `strata_test`.
+  Checkout-local unit and documentation checks do not start Compose and must
+  never read live configuration or access live resources.
 - `scripts/ci.sh` is the only sanctioned path for destructive cleanup. Never
   invoke `docker compose down -v` directly.
 - The cleanup guard must require all three conditions: the project starts with
