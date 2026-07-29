@@ -14,21 +14,20 @@ data slice, and a versioned run.
 - **[PRD v3.2 (canonical spec)](docs/Strata_PRD_v3.2_MASTER.md)** — dataset
   contract (§3), index events (§5.2), exposure states (§5.4), matching (§5.5),
   retention (§5.6), architecture and coverage (§7).
-- **[AGENTS.md](AGENTS.md)** — standing instructions for AI coding agents.
+- **[AGENTS.md](AGENTS.md)** — repository operating guidance for contributors.
 
 Read the PRD before inventing schemas, population definitions, or chain
 semantics.
 
-## Status
+## Current capabilities
 
-**Day 2 of 37 — migration engine.** Postgres plus a Python service that
-connects, runs an explicit ledger-only bootstrap, applies ordered checksummed
-SQL migrations transactionally, logs `connected`, and idles. Migration 001
-populates a sentinel proving the mechanism. There is no ingestion or analytics
-yet.
+Postgres plus a Python service that connects, runs an explicit ledger-only
+bootstrap, applies ordered checksummed SQL migrations transactionally, logs
+`connected`, and idles. Migration 001 populates a sentinel proving the
+mechanism.
 
-No empirical study findings are published because no qualifying live analytics
-run exists yet.
+**Not yet implemented:** ingestion, analytics. No empirical findings are
+published because no qualifying live analytics run exists.
 
 ## Quick start
 
@@ -58,8 +57,9 @@ python -m pip install -e ".[test]"
 This setup is required only for `make test-unit` and `make test-docs`;
 `make green` remains Docker-based.
 
-Operational convenience targets are `make up`, `make down`, `make clean`,
-`make logs`, `make psql`, and `make fg`; run `make help` for their descriptions.
+`make help` reports the complete target surface: `help`, `green`, `up`, `fg`,
+`verify`, `test`, `test-unit`, `test-integration`, `test-e2e`, `test-docs`,
+`down`, `clean`, `logs`, and `psql`.
 
 For manual foreground startup only, the following non-verification convenience
 is also supported:
@@ -103,14 +103,15 @@ empty-but-serving dashboard, or a swallowed error.
 ## Layout
 
 ```
-src/strata/           Python package implementation
-tests/                fast checkout-local tests
+src/strata/           Python package (installed; no sys.path mutation)
+tests/                fast unit tests
 integration_tests/    PostgreSQL-backed integration tests
 migrations/           ledger-only bootstrap + ordered numbered SQL migrations
-docs/                 canonical PRD and focused guidance
-Makefile              public task and verification interface
-scripts/ci.sh         guarded Compose lifecycle and container-backed suites
-Dockerfile            application image
-docker-compose.yml    PostgreSQL and application services
+docs/                 canonical PRD and focused engineering guidance
+scripts/ci.sh         internal Compose lifecycle + destructive-cleanup guard
+Makefile              public command interface
+Dockerfile            service image
+pyproject.toml        packaging
+docker-compose.yml    postgres + app
 .env.demo             demo configuration (no secrets)
 ```
